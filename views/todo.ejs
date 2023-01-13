@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" href="/assets/styles.css" type="text/css" />
+    <title>Todo App</title>
+  </head>
+  <body>
+    <h1>MY TODO LIST</h1>
+    <div class="header">
+      <h1 id="error" class="hidden">Task not added</h1>
+      <h1 id="success" class="hidden">Task deleted successfully</h1>
+
+      <form action="/todo" method="post">
+        <input type="text" name="item" placeholder="Add new task..." required />
+        <button type="submit" onclick="location.reload()" class="addBtn">
+          Create Task
+        </button>
+      </form>
+    </div>
+
+    <ul>
+      <% for (var i=0; i < todos.length; i++){ %>
+      <li
+        class="todolist"
+        id="todolist--<%= todos[i]._id %>"
+        data-id="<%= todos[i]._id %>"
+      >
+        <%= todos[i].item %>
+      </li>
+      <% } %>
+    </ul>
+  </body>
+
+  <!-- To delete item on the list. -->
+
+  <script>
+    function confirmation() {
+      var result = confirm("Are you sure to delete?");
+      if (result) {
+        return true;
+      }
+    }
+
+    var li = document.querySelectorAll(".todolist");
+    li.forEach((item) => {
+      item.addEventListener("click", function (e) {
+        confirmation();
+        e.preventDefault();
+        id = e.target.dataset["id"];
+        itemId = document.getElementById(`todolist--${id}`);
+
+        fetch(`/todo/${id}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then(function () {
+            itemId.remove();
+            document.getElementById("success").className = " ";
+          })
+          .catch(function (err) {
+            document.getElementById("error").className = " ";
+            console.log(err);
+          });
+      });
+    });
+  </script>
+</html>
